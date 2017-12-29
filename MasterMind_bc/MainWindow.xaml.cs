@@ -35,7 +35,8 @@ namespace MasterMind_bc
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
             Init();
-            await Task.Run(() => Start());
+            await Start();
+            //await Task.Run(() => Start());
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)

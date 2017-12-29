@@ -27,7 +27,7 @@ namespace MasterMind_bc
             mass = new int[4];
         }
 
-        public async void Start()
+        public async Task Start()
         {
             Random rand = new Random();
             int k = 0; // для индексации mass
