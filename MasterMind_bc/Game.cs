@@ -49,7 +49,7 @@ namespace MasterMind_bc
             {
                 ShowArr();
                 await Read();
-                do_continue = DoPreAnalyse(ref k);
+                do_continue = await DoPreAnalyse(k);
                 if (first_time_flag)
                 {
                     first_time_flag = false;
@@ -66,7 +66,7 @@ namespace MasterMind_bc
             }
         }
 
-        bool DoPreAnalyse(ref int index)
+        async Task<bool> DoPreAnalyse(int index)
         {
             if (bulls == 4)
             {
@@ -79,7 +79,7 @@ namespace MasterMind_bc
                 {
                     ready_indexes.Add(index);
                 }
-                DoTransposition();
+                await DoTransposition();
                 return false;
             }
             else if (bulls + cows == 0)
@@ -203,7 +203,7 @@ namespace MasterMind_bc
             isSelectedDuetoAdvance = false;
         }
 
-        async void DoTransposition()
+        async Task DoTransposition()
         {
             int first_hand = -1;
             int second_hand = -1;
