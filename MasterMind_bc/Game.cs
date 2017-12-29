@@ -95,7 +95,6 @@ namespace MasterMind_bc
 
         void DoAnalyse(ref int index)
         {
-            Console.WriteLine("Analyze...");
             if (prev_cows == cows)
             {
                 if (prev_bulls == bulls)
@@ -216,7 +215,7 @@ namespace MasterMind_bc
                 await Read();
                 if (bulls == prev_bulls + 1)
                 {
-                    FindSingleBull(first_hand, second_hand);
+                    await FindSingleBull(first_hand, second_hand);
                     first_hand = -1;
                     second_hand = -1;
                 }
@@ -231,7 +230,7 @@ namespace MasterMind_bc
                 {
                     Swap(ref mass[first_hand], ref mass[second_hand]);
                     bulls++;
-                    FindSingleBull(first_hand, second_hand);
+                    await FindSingleBull(first_hand, second_hand);
                     first_hand = -1;
                     second_hand = -1;
                 }
@@ -277,7 +276,7 @@ namespace MasterMind_bc
             b = temp;
         }
 
-        async void FindSingleBull(int a, int b)
+        async Task FindSingleBull(int a, int b)
         {
             Random r = new Random();
             int prev_v = mass[a];
