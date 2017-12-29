@@ -323,6 +323,7 @@ namespace MasterMind_bc
             textBlock.Text = temp_s;
         }
 
+        int counting = 0;
         void ChangeValue(int i)
         {
             Random r = new Random();
@@ -339,6 +340,7 @@ namespace MasterMind_bc
                     mass[i] = 1 + r.Next() % 9;
                 while (prev_value == mass[i] || CheckValue(i));
             }
+            debug.Text = counting++.ToString();
         }
 
         bool CheckValue(int i)

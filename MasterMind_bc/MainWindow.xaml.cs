@@ -36,7 +36,6 @@ namespace MasterMind_bc
         {
             Init();
             await Start();
-            //await Task.Run(() => Start());
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
