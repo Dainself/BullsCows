@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MasterMind_bc
@@ -15,6 +14,9 @@ namespace MasterMind_bc
         bool isSelectedDuetoAdvance, isWin, isCOWS_THREAD;
         public void Init()
         {
+            isWin = false;
+            isSelectedDuetoAdvance = false;
+            isCOWS_THREAD = false;
             unnecessary_digitals = new SortedSet<int>();
             cows_list = new SortedSet<int>();
             COWS_THREAD = new SortedSet<int>();
@@ -25,13 +27,7 @@ namespace MasterMind_bc
                 used_digitals[i] = new SortedSet<int>();
             }
             mass = new int[4];
-        }
-
-        public async Task Start()
-        {
             Random rand = new Random();
-            int k = 0; // для индексации mass
-            bool first_time_flag = true, do_continue;
             for (int i = 0; i < 4; i++) // заполняю случ значениями
             {
                 do
@@ -44,12 +40,18 @@ namespace MasterMind_bc
             {
                 used_digitals[i].Add(mass[i]);
             }
+        }
 
-            while (!isWin) // вот здесь начинается цикл
+        public async Task Start()
+        {
+            int k = 0; // для индексации mass
+            bool first_time_flag = true, do_continue;
+            // игровой цикл
+            while (!isWin) 
             {
                 ShowArr();
                 await Read();
-                do_continue = await DoPreAnalyse(k);
+                do_continue = await DoPreAnalyse(k, first_time_flag);
                 if (first_time_flag)
                 {
                     first_time_flag = false;
@@ -66,7 +68,7 @@ namespace MasterMind_bc
             }
         }
 
-        async Task<bool> DoPreAnalyse(int index)
+        async Task<bool> DoPreAnalyse(int index, bool status) // возможно это не пре, а пост анализ. стоит обдумоть
         {
             if (bulls == 4)
             {
@@ -75,7 +77,7 @@ namespace MasterMind_bc
             }
             else if (bulls + cows == 4)
             {
-                if (prev_bulls < bulls)
+                if (prev_bulls < bulls && !status)
                 {
                     ready_indexes.Add(index);
                 }
@@ -322,7 +324,6 @@ namespace MasterMind_bc
             textBlock.Text = temp_s;
         }
 
-        int counting = 0;
         void ChangeValue(int i)
         {
             Random r = new Random();
@@ -339,7 +340,6 @@ namespace MasterMind_bc
                     mass[i] = 1 + r.Next() % 9;
                 while (prev_value == mass[i] || CheckValue(i));
             }
-            debug.Text = counting++.ToString();
         }
 
         bool CheckValue(int i)

@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Threading;
 
 namespace MasterMind_bc
 {
@@ -25,7 +16,7 @@ namespace MasterMind_bc
             InitializeComponent();
         }
 
-        System.Threading.EventWaitHandle handle = new System.Threading.AutoResetEvent(false);
+        EventWaitHandle handle = new AutoResetEvent(false);
 
         public void UserProccesing()
         {
@@ -34,17 +25,54 @@ namespace MasterMind_bc
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
+            status.Text = "Загрузка, подождите...";
+            await Task.Run(() => Thread.Sleep(500));
+            status.Text = "Играем";
             Init();
             await Start();
+            status.Text = "Это победа";
+            counting = 0;
         }
-
+        int counting = 0;
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            bulls = Int32.Parse(textBox.Text);
-            cows = Int32.Parse(textBox2.Text);
-            textBox.Clear();
-            textBox2.Clear();
-            handle.Set();
+            if (status.Text == "Играем")
+            {
+                try
+                {
+                    bulls = Int32.Parse(textBox.Text);
+                    cows = Int32.Parse(textBox2.Text);
+                }
+                catch (FormatException ex)
+                {
+                    MessageBox.Show(ex.Message +"\nПожалуйста, попробуйте еще раз.");
+                    return;
+                }
+                textBox.Clear();
+                textBox2.Clear();
+                count.Text = (++counting).ToString();
+                handle.Set();
+            }
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void textBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (IsNumbericChar(e.Key)) e.Handled = true;
+        }
+
+        private bool IsNumbericChar(Key key)
+        {
+            if (key != Key.D1 && key != Key.NumPad1 &&
+                key != Key.D2 && key != Key.NumPad2 &&
+                key != Key.D3 && key != Key.NumPad3 &&
+                key != Key.D4 && key != Key.NumPad4)
+                return true;
+            return false;
         }
     }
 }
