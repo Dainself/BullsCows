@@ -11,7 +11,7 @@ namespace MasterMind_bc
         SortedSet<int>[] used_digitals;
         int bulls, prev_bulls, cows, prev_cows, prev_value;
         int[] mass;
-        bool isSelectedDuetoAdvance, isWin, isCOWS_THREAD;
+        bool isSelectedDuetoAdvance, isWin = true, isCOWS_THREAD;
         public void Init()
         {
             isWin = false;
@@ -321,7 +321,7 @@ namespace MasterMind_bc
             {
                 temp_s += elem.ToString();
             }
-            textBlock.Text = temp_s;
+            ans.Text = temp_s;
         }
 
         void ChangeValue(int i)

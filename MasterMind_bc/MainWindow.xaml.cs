@@ -25,18 +25,18 @@ namespace MasterMind_bc
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            status.Text = "Загрузка, подождите...";
+            status.Content = "Загрузка, подождите...";
             await Task.Run(() => Thread.Sleep(500));
-            status.Text = "Играем";
+            status.Content = "Играем";
             Init();
             await Start();
-            status.Text = "Это победа";
+            status.Content = "Это победа";
             counting = 0;
         }
         int counting = 0;
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            if (status.Text == "Играем")
+            if (!isWin)
             {
                 try
                 {

@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MasterMind_bc"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        <Button x:Name="button" Content="Exit" HorizontalAlignment="Left" Margin="400,25,0,0" VerticalAlignment="Top" Width="89" Height="36" Click="button_Click"/>
-        <Button x:Name="button2" Content="Start" HorizontalAlignment="Left" Margin="300,25,0,0" VerticalAlignment="Top" Width="89" Height="36" Click="button2_Click"/>
+        Title="MainWindow" Height="202.5" Width="380.833">
+    <Grid Margin="0,0,2,2">
+        <Button x:Name="button" Content="Exit" HorizontalAlignment="Left" Margin="11,113,0,0" VerticalAlignment="Top" Width="70" Height="30" Click="button_Click"/>
+        <Button x:Name="button2" Content="Start" HorizontalAlignment="Left" Margin="11,10,0,0" VerticalAlignment="Top" Width="70" Height="30" Click="button2_Click"/>
 
-        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="105,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.5,0.5" KeyDown="textBox_KeyDown">
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="22" Margin="179,78,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5" KeyDown="textBox_KeyDown">
             <TextBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -20,7 +20,7 @@
                 </TransformGroup>
             </TextBox.RenderTransform>
         </TextBox>
-        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="24" Margin="298,192,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="100" RenderTransformOrigin="0.5,0.5">
+        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="24" Margin="264,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5">
             <TextBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -30,13 +30,14 @@
                 </TransformGroup>
             </TextBox.RenderTransform>
         </TextBox>
-        <Label x:Name="label" Content="Num of bulls" HorizontalAlignment="Left" Margin="105,159,0,0" VerticalAlignment="Top" Width="100" Height="28" HorizontalContentAlignment="Center"/>
-        <Label x:Name="label2" Content="Num of cows" HorizontalAlignment="Left" Margin="300,159,0,0" VerticalAlignment="Top" Width="100" Height="28" HorizontalContentAlignment="Center"/>
-        <TextBlock x:Name="textBlock" FontSize="13" HorizontalAlignment="Left" Margin="271,109,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="19" Width="68" RenderTransformOrigin="0.49,0.487" Foreground="#FF150505"/>
-        <Label x:Name="label3" Content="My answer:" HorizontalAlignment="Left" Margin="189,105,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="button1" Content="OK" HorizontalAlignment="Left" Margin="215,230,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click"/>
-        <TextBox x:Name="status" HorizontalAlignment="Left" Height="23" Margin="355,263,0,0" TextWrapping="Wrap" Text="Status" VerticalAlignment="Top" Width="134" IsReadOnly="True"/>
-        <TextBox x:Name="count" HorizontalAlignment="Left" Height="23" Margin="433,81,0,0" TextWrapping="Wrap" Text="count" VerticalAlignment="Top" Width="56" IsReadOnly="True"/>
+        <Label x:Name="label" Content="Num of bulls" HorizontalAlignment="Left" Margin="179,47,0,0" VerticalAlignment="Top" Width="80" HorizontalContentAlignment="Center"/>
+        <Label x:Name="label2" Content="Num of cows" HorizontalAlignment="Left" Margin="264,47,0,0" VerticalAlignment="Top" Width="80" HorizontalContentAlignment="Center"/>
+        <Label x:Name="label3" Content="My answer:" HorizontalAlignment="Left" Margin="179,10,0,0" VerticalAlignment="Top" Width="77"/>
+        <Button x:Name="button1" Content="OK" HorizontalAlignment="Left" Margin="226,105,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click"/>
+        <TextBox x:Name="count" HorizontalAlignment="Left" Height="24" Margin="71,51,0,0" TextWrapping="Wrap" Text="count" VerticalAlignment="Top" Width="75" IsReadOnly="True"/>
+        <Label x:Name="label1" Content="Turn:" HorizontalAlignment="Left" Margin="11,51,0,0" VerticalAlignment="Top" Width="55"/>
+        <Label x:Name="status" Content="Status" HorizontalAlignment="Left" Margin="11,82,0,0" VerticalAlignment="Top" Width="135"/>
+        <TextBox x:Name="ans" HorizontalAlignment="Left" Height="23" Margin="262,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="76"/>
 
     </Grid>
 </Window>
