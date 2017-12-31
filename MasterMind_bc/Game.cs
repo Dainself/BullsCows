@@ -1,20 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MasterMind_bc
 {
-    partial class MainWindow
+    public class AppealToUserEventArgs : EventArgs
+    {
+        readonly string arr;
+
+        public AppealToUserEventArgs(string str) { arr = str; }
+
+        public string Arr
+        {
+            get { return arr; }
+        }
+    }
+
+    public class Game
     {
         SortedSet<int> unnecessary_digitals, cows_list, COWS_THREAD, ready_indexes;
         SortedSet<int>[] used_digitals;
-        int bulls, prev_bulls, cows, prev_cows, prev_value;
+        int prev_bulls, prev_cows, prev_value;
+        public int bulls, cows;
         int[] mass;
-        bool isSelectedDuetoAdvance, isWin = true, isCOWS_THREAD;
-        public void Init()
+        bool isSelectedDuetoAdvance, isWin, isCOWS_THREAD;
+        public event EventHandler appeal_to_user;
+        public Game(MainWindow that)
         {
-            isWin = false;
+            show_text += that.ShowText;
+            appeal_to_user += that.UserProcessing;
             isSelectedDuetoAdvance = false;
             isCOWS_THREAD = false;
             unnecessary_digitals = new SortedSet<int>();
@@ -49,8 +65,7 @@ namespace MasterMind_bc
             // игровой цикл
             while (!isWin) 
             {
-                ShowArr();
-                await Read();
+                await ShowRead();
                 do_continue = await DoPreAnalyse(k, first_time_flag);
                 if (first_time_flag)
                 {
@@ -213,8 +228,7 @@ namespace MasterMind_bc
                 IndexShift(ref first_hand, ref second_hand);
                 Swap(ref mass[first_hand], ref mass[second_hand]);
                 //считать
-                ShowArr();
-                await Read();
+                await ShowRead();
                 if (bulls == prev_bulls + 1)
                 {
                     await FindSingleBull(first_hand, second_hand);
@@ -223,8 +237,8 @@ namespace MasterMind_bc
                 }
                 else if (bulls == prev_bulls + 2)
                 {
-                    ready_indexes.Add(mass[first_hand]);
-                    ready_indexes.Add(mass[second_hand]);
+                    ready_indexes.Add(first_hand);
+                    ready_indexes.Add(second_hand);
                     first_hand = -1;
                     second_hand = -1;
                 }
@@ -285,8 +299,7 @@ namespace MasterMind_bc
             do
                 mass[a] = 1 + r.Next() % 9;
             while (prev_v == mass[a] || EqualToOtherNumbers(a));
-            ShowArr();
-            await Read();
+            await ShowRead();
             mass[a] = prev_v;
             if (prev_bulls > bulls)
             {
@@ -307,21 +320,26 @@ namespace MasterMind_bc
             return false;
         }
 
-        async Task Read()
+        async Task RaiseAppeal(AppealToUserEventArgs e)
         {
-            prev_bulls = bulls;
-            prev_cows = cows;
-            await Task.Run(() => UserProccesing());
+            //EventHandler<AppealToUserEventArgs> temp = Volatile.Read(ref appeal_to_user);
+            //if (temp != null) await Task.Run(() => temp(this, e));
+            await Task.Run(() => Volatile.Read(ref appeal_to_user)?.Invoke(this, e));
         }
 
-        void ShowArr()
+        public event EventHandler<AppealToUserEventArgs> show_text;
+        async Task ShowRead() // выполняется только это
         {
             string temp_s = "";
             foreach (int elem in mass)
             {
                 temp_s += elem.ToString();
             }
-            ans.Text = temp_s;
+            AppealToUserEventArgs e = new AppealToUserEventArgs(temp_s);
+            prev_bulls = bulls;
+            prev_cows = cows;
+            show_text(this, e);
+            await RaiseAppeal(null);
         }
 
         void ChangeValue(int i)

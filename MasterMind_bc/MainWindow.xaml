@@ -20,7 +20,7 @@
                 </TransformGroup>
             </TextBox.RenderTransform>
         </TextBox>
-        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="24" Margin="264,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5">
+        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="24" Margin="264,75,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5" KeyDown="textBox2_KeyDown">
             <TextBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
