@@ -22,15 +22,23 @@ namespace MasterMind_bc
     {
         SortedSet<int> unnecessary_digitals, cows_list, COWS_THREAD, ready_indexes;
         SortedSet<int>[] used_digitals;
-        int prev_bulls, prev_cows, prev_value;
-        public int bulls, cows;
+        int bulls, cows, prev_bulls, prev_cows, prev_value;
         int[] mass;
         bool isSelectedDuetoAdvance, isWin, isCOWS_THREAD;
         public event EventHandler appeal_to_user;
-        public Game(MainWindow that)
+
+        public int Bulls
         {
-            show_text += that.ShowText;
-            appeal_to_user += that.UserProcessing;
+            set { bulls = value; }
+        }
+
+        public int Cows
+        {
+            set { cows = value; }
+        }
+
+        public Game()
+        {
             isSelectedDuetoAdvance = false;
             isCOWS_THREAD = false;
             unnecessary_digitals = new SortedSet<int>();
@@ -58,15 +66,15 @@ namespace MasterMind_bc
             }
         }
 
-        public async Task Start()
+        public async Task Start(CancellationToken token)
         {
             int k = 0; // для индексации mass
             bool first_time_flag = true, do_continue;
             // игровой цикл
             while (!isWin) 
             {
-                await ShowRead();
-                do_continue = await DoPreAnalyse(k, first_time_flag);
+                await ShowRead(token);
+                do_continue = await DoPreAnalyse(k, first_time_flag, token);
                 if (first_time_flag)
                 {
                     first_time_flag = false;
@@ -83,7 +91,7 @@ namespace MasterMind_bc
             }
         }
 
-        async Task<bool> DoPreAnalyse(int index, bool status) // возможно это не пре, а пост анализ. стоит обдумоть
+        async Task<bool> DoPreAnalyse(int index, bool status, CancellationToken token) // возможно это не пре, а пост анализ. стоит обдумоть
         {
             if (bulls == 4)
             {
@@ -96,7 +104,7 @@ namespace MasterMind_bc
                 {
                     ready_indexes.Add(index);
                 }
-                await DoTransposition();
+                await DoTransposition(token);
                 return false;
             }
             else if (bulls + cows == 0)
@@ -219,7 +227,7 @@ namespace MasterMind_bc
             isSelectedDuetoAdvance = false;
         }
 
-        async Task DoTransposition()
+        async Task DoTransposition(CancellationToken token)
         {
             int first_hand = -1;
             int second_hand = -1;
@@ -228,10 +236,10 @@ namespace MasterMind_bc
                 IndexShift(ref first_hand, ref second_hand);
                 Swap(ref mass[first_hand], ref mass[second_hand]);
                 //считать
-                await ShowRead();
+                await ShowRead(token);
                 if (bulls == prev_bulls + 1)
                 {
-                    await FindSingleBull(first_hand, second_hand);
+                    await FindSingleBull(first_hand, second_hand, token);
                     first_hand = -1;
                     second_hand = -1;
                 }
@@ -246,7 +254,7 @@ namespace MasterMind_bc
                 {
                     Swap(ref mass[first_hand], ref mass[second_hand]);
                     bulls++;
-                    await FindSingleBull(first_hand, second_hand);
+                    await FindSingleBull(first_hand, second_hand, token);
                     first_hand = -1;
                     second_hand = -1;
                 }
@@ -292,14 +300,14 @@ namespace MasterMind_bc
             b = temp;
         }
 
-        async Task FindSingleBull(int a, int b)
+        async Task FindSingleBull(int a, int b, CancellationToken token)
         {
             Random r = new Random();
             int prev_v = mass[a];
             do
                 mass[a] = 1 + r.Next() % 9;
             while (prev_v == mass[a] || EqualToOtherNumbers(a));
-            await ShowRead();
+            await ShowRead(token);
             mass[a] = prev_v;
             if (prev_bulls > bulls)
             {
@@ -328,7 +336,7 @@ namespace MasterMind_bc
         }
 
         public event EventHandler<AppealToUserEventArgs> show_text;
-        async Task ShowRead() // выполняется только это
+        async Task ShowRead(CancellationToken token) // выполняется только это
         {
             string temp_s = "";
             foreach (int elem in mass)
@@ -340,6 +348,7 @@ namespace MasterMind_bc
             prev_cows = cows;
             show_text(this, e);
             await RaiseAppeal(null);
+            token.ThrowIfCancellationRequested();
         }
 
         void ChangeValue(int i)
