@@ -338,11 +338,12 @@ namespace MasterMind_bc
         public event EventHandler<AppealToUserEventArgs> show_text;
         async Task ShowRead(CancellationToken token) // выполняется только это
         {
-            string temp_s = "";
+            /*string temp_s = "";
             foreach (int elem in mass)
             {
                 temp_s += elem.ToString();
-            }
+            }*/
+            string temp_s = Utils.ArrToString(mass);
             AppealToUserEventArgs e = new AppealToUserEventArgs(temp_s);
             prev_bulls = bulls;
             prev_cows = cows;

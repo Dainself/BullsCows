@@ -30,12 +30,12 @@ namespace MasterMind_bc
         int[] mass, user_mass;
         int bulls, cows;
 
-        int[] UserMass
+        public int[] UserMass
         {
             set { user_mass = value; }
         }
 
-        GameUserSide()
+        public GameUserSide()
         {
             mass = new int[4];
             Random rand = new Random();
@@ -49,11 +49,12 @@ namespace MasterMind_bc
             }
         }
 
-        public async Task Start()
+        public async Task Start(CancellationToken token)
         {
             await Read();
             DoAnalyse();
             Show();
+            token.ThrowIfCancellationRequested();
         }
 
         void DoAnalyse()
