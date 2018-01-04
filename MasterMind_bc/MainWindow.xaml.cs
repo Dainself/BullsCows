@@ -13,7 +13,7 @@ namespace MasterMind_bc
     {
         int counting;
         bool isPlaying;
-        Game game;
+        GameCPUSide game;
         int first_field, second_field;
         CancellationTokenSource tokenSource;
         public MainWindow()
@@ -26,8 +26,8 @@ namespace MasterMind_bc
         void UserProcessing(object sender, EventArgs e)
         {
             handle.WaitOne();
-            ((Game)sender).Bulls = first_field;
-            ((Game)sender).Cows = second_field;
+            ((GameCPUSide)sender).Bulls = first_field;
+            ((GameCPUSide)sender).Cows = second_field;
         }
 
         void ShowText(object sender, AppealToUserEventArgs e)
@@ -48,7 +48,7 @@ namespace MasterMind_bc
             counting = 0;
             tokenSource = new CancellationTokenSource();
             CancellationToken token = tokenSource.Token;
-            game = new Game();
+            game = new GameCPUSide();
             game.appeal_to_user += UserProcessing;
             game.show_text += ShowText;
             count.Text = counting.ToString();

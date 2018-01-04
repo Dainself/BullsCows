@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MasterMind_bc
 {
-    public class AppealToUserEventArgs : EventArgs
+    class AppealToUserEventArgs : EventArgs
     {
         readonly string arr;
 
@@ -18,7 +18,7 @@ namespace MasterMind_bc
         }
     }
 
-    public class Game
+    class GameCPUSide
     {
         SortedSet<int> unnecessary_digitals, cows_list, COWS_THREAD, ready_indexes;
         SortedSet<int>[] used_digitals;
@@ -37,7 +37,7 @@ namespace MasterMind_bc
             set { cows = value; }
         }
 
-        public Game()
+        public GameCPUSide()
         {
             isSelectedDuetoAdvance = false;
             isCOWS_THREAD = false;
@@ -58,7 +58,7 @@ namespace MasterMind_bc
                 {
                     mass[i] = 1 + rand.Next() % 9;
                 }
-                while (Check(i));
+                while (Utils.Check(mass, i));
             }
             for (int i = 1; i < 4; i++)
             {
@@ -320,15 +320,15 @@ namespace MasterMind_bc
             }
         }
 
-        bool Check(int limit)
+        /*bool Check(int limit)
         {
             for (int j = 0; j < limit; j++)
                 if (mass[j] == mass[limit])
                     return true;
             return false;
-        }
+        }*/
 
-        async Task RaiseAppeal(AppealToUserEventArgs e)
+        async Task RaiseAppeal(/*AppealToUser*/EventArgs e)
         {
             //EventHandler<AppealToUserEventArgs> temp = Volatile.Read(ref appeal_to_user);
             //if (temp != null) await Task.Run(() => temp(this, e));
