@@ -29,6 +29,7 @@ namespace MasterMind_bc
     {
         int[] mass, user_mass;
         int bulls, cows;
+        bool isWin;
 
         public int[] UserMass
         {
@@ -49,12 +50,15 @@ namespace MasterMind_bc
             }
         }
 
-        public async Task Start(CancellationToken token)
+        public async void Start(CancellationToken token)
         {
-            await Read();
-            DoAnalyse();
-            Show();
-            token.ThrowIfCancellationRequested();
+            while (!isWin)
+            {
+                await Read();
+                DoAnalyse();
+                Show();
+                token.ThrowIfCancellationRequested();
+            }
         }
 
         void DoAnalyse()
@@ -76,6 +80,7 @@ namespace MasterMind_bc
                         break;
                 }
             }
+            if (bulls == 4) isWin = true;
         }
 
         int DoRealAnalyse(int digit, int index)

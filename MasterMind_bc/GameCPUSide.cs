@@ -66,7 +66,7 @@ namespace MasterMind_bc
             }
         }
 
-        public async Task Start(CancellationToken token)
+        public async void Start(CancellationToken token)
         {
             int k = 0; // для индексации mass
             bool first_time_flag = true, do_continue;
