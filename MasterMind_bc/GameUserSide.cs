@@ -54,10 +54,13 @@ namespace MasterMind_bc
         {
             while (!isWin)
             {
-                await Read();
-                DoAnalyse();
-                Show();
-                token.ThrowIfCancellationRequested();
+                try
+                {
+                    await Read(token);
+                    DoAnalyse();
+                    Show();
+                }
+                catch (OperationCanceledException oce) { return; }
             }
         }
 
@@ -104,12 +107,13 @@ namespace MasterMind_bc
             await Task.Run(() => Volatile.Read(ref appeal_to_user)?.Invoke(this, e));
         }
 
-        async Task Read()
+        async Task Read(CancellationToken token)
         {
             // считываю от юзверя строку-массив
             // считаю сколько быков коров
             // и отвечаю
             await RaiseAppeal(null);
+            token.ThrowIfCancellationRequested();
         }
 
         public event EventHandler<AppealToUserEventArgs2> show_result;

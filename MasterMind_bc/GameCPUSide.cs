@@ -73,21 +73,25 @@ namespace MasterMind_bc
             // игровой цикл
             while (!isWin) 
             {
-                await ShowRead(token);
-                do_continue = await DoPreAnalyse(k, first_time_flag, token);
-                if (first_time_flag)
+                try
                 {
-                    first_time_flag = false;
-                    goto for_the_first_time;
+                    await ShowRead(token);
+                    do_continue = await DoPreAnalyse(k, first_time_flag, token);
+                    if (first_time_flag)
+                    {
+                        first_time_flag = false;
+                        goto for_the_first_time;
+                    }
+                    if (do_continue) DoAnalyse(ref k);
+                    if (isWin) return;
+                    for_the_first_time:
+                    {
+                        used_digitals[k].Add(mass[k]);
+                        prev_value = mass[k];
+                        ChangeValue(k);
+                    }
                 }
-                if (do_continue) DoAnalyse(ref k);
-                if (isWin) return;
-                for_the_first_time:
-                {
-                    used_digitals[k].Add(mass[k]);
-                    prev_value = mass[k];
-                    ChangeValue(k);
-                }
+                catch (OperationCanceledException oce) { return; }
             }
         }
 
