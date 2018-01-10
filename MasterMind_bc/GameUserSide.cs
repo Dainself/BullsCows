@@ -27,9 +27,11 @@ namespace MasterMind_bc
 
     class GameUserSide
     {
+        public EventWaitHandle main_handle = new AutoResetEvent(false);
         int[] mass, user_mass;
         int bulls, cows;
         bool isWin;
+        public bool isShowRequired = true;
 
         public int[] UserMass
         {
@@ -40,14 +42,16 @@ namespace MasterMind_bc
         {
             mass = new int[4];
             Random rand = new Random();
-            for (int i = 0; i < 4; i++) // заполняю случ значениями
+            // for debug
+            for (int i = 0; i < 4; ) mass[i] = ++i;
+            /*for (int i = 0; i < 4; i++) // заполняю случ значениями
             {
                 do
                 {
                     mass[i] = 1 + rand.Next() % 9;
                 }
                 while (Utils.Check(mass, i));
-            }
+            }*/
         }
 
         public async void Start(CancellationToken token)
@@ -57,10 +61,11 @@ namespace MasterMind_bc
                 try
                 {
                     await Read(token);
+                    if (!isShowRequired) token.ThrowIfCancellationRequested();
                     DoAnalyse();
-                    Show();
+                    Show(token);
                 }
-                catch (OperationCanceledException oce) { return; }
+                catch (OperationCanceledException oce) { main_handle.Set(); return; }
             }
         }
 
@@ -112,16 +117,17 @@ namespace MasterMind_bc
             // считываю от юзверя строку-массив
             // считаю сколько быков коров
             // и отвечаю
-            await RaiseAppeal(null);
             token.ThrowIfCancellationRequested();
+            await RaiseAppeal(null);
         }
 
         public event EventHandler<AppealToUserEventArgs2> show_result;
-        void Show()
+        void Show(CancellationToken token)
         {
             //if (bulls == 4) //уведомить о победе /// нет. на той стороне сами пусть проверяют
             ///говорю результат
             show_result(this, new AppealToUserEventArgs2(bulls, cows));
+            token.ThrowIfCancellationRequested();
         }
     }
 }

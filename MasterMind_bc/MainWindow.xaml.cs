@@ -18,14 +18,13 @@ namespace MasterMind_bc
         GameUserSide gameUser;
         int first_field, second_field;
         string third_field;
-        CancellationTokenSource tokenSource;
-        CancellationToken token;
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        //EventWaitHandle main_handle = new AutoResetEvent(false);
+        CancellationTokenSource CPUtokenSource;
+        CancellationTokenSource UsertokenSource;
         EventWaitHandle handleCPU = new AutoResetEvent(false);
         EventWaitHandle handleUser = new AutoResetEvent(false);
         bool is_handleCPU_set;
@@ -36,7 +35,18 @@ namespace MasterMind_bc
             if (first_field == 4)
             {
                 isCPUwins = true;
-                tokenSource.Cancel();
+                CPUtokenSource.Cancel();
+                UsertokenSource.Cancel();
+                if (is_handleUser_set)
+                {
+                    gameUser.isShowRequired = false;
+                    handleUser.Set();
+                }
+            }
+            if (is_handleCPU_set && is_handleUser_set)
+            {
+                is_handleCPU_set = false;
+                is_handleUser_set = false;
             }
             ((GameCPUSide)sender).Bulls = first_field;
             ((GameCPUSide)sender).Cows = second_field;
@@ -58,7 +68,14 @@ namespace MasterMind_bc
             if (e.Bulls == 4)
             {
                 isUserwins = true;
-                tokenSource.Cancel();
+                UsertokenSource.Cancel();
+                CPUtokenSource.Cancel();
+                if (is_handleCPU_set) handleCPU.Set();
+            }
+            if (is_handleCPU_set && is_handleUser_set)
+            {
+                is_handleCPU_set = false;
+                is_handleUser_set = false;
             }
             textBox1.Text += third_field;
             textBox1.Text += GiveMeSpaces(15);
@@ -70,18 +87,31 @@ namespace MasterMind_bc
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            if (gameCPU != null && gameUser != null && tokenSource != null)
+            if (CPUtokenSource != null && UsertokenSource != null/** && gameCPU != null && gameUser != null*/)
             {
-                tokenSource.Cancel();
-                handleCPU.Set();
-                handleUser.Set();
+                gameUser.isShowRequired = false;
+                CPUtokenSource.Cancel();
+                UsertokenSource.Cancel();
+                if (!is_handleCPU_set) handleCPU.Set();
+                if (!is_handleUser_set) handleUser.Set();
             }
+            isUserwins = false;
+            isCPUwins = false;
+            isPlaying = false;
+            is_handleCPU_set = false;
+            is_handleUser_set = false;
+            first_field = 0;
+            second_field = 0;
+            third_field = "";
+
             status.Content = "Загрузка, подождите...";
-            await Task.Run(() => Thread.Sleep(420));
+            await Task.Run(() => Thread.Sleep(380));
             isPlaying = true;
             counting = 0;
-            tokenSource = new CancellationTokenSource();
-            token = tokenSource.Token;
+            CPUtokenSource = new CancellationTokenSource();
+            UsertokenSource = new CancellationTokenSource();
+            CancellationToken CPUtoken = CPUtokenSource.Token;
+            CancellationToken Usertoken = UsertokenSource.Token;
             /** CPU Side **/
             gameCPU = new GameCPUSide();
             gameCPU.appeal_to_user += UserProcessing;
@@ -91,46 +121,44 @@ namespace MasterMind_bc
             gameUser.appeal_to_user += UserProcessing2;
             gameUser.show_result += ShowText2;
 
+            ans.Text = "";
+            textBox1.Text = "";
             count.Text = counting.ToString();
             status.Content = "Играем";
             Parallel.Invoke(async () =>
             {
-                try
-                {
-                    await Application.Current.Invoke(() => { gameCPU.Start(token); });
-                    //async () => await Application.Current.Invoke(() => { gameCPU.Start(token); }
-                }
-                catch (OperationCanceledException oce) { }
+                await Application.Current.Invoke(() => { gameCPU.Start(CPUtoken); });
             }, async () =>
             {
-                try
-                {
-                    await Application.Current.Invoke(() => { gameUser.Start(token); });
-                    //async () => await Application.Current.Invoke(() => { gameUser.Start(token); }
-                }
-                catch (OperationCanceledException oce) { }
+                await Application.Current.Invoke(() => { gameUser.Start(Usertoken); });
             });
+            await Task.Run(() => gameCPU.main_handle.WaitOne());
+            await Task.Run(() => gameUser.main_handle.WaitOne());
 
             /*await Application.Current.Invoke(() => { gameUser.Start(token); }));*/
             //Parallel.Invoke(async () => await gameCPU.Start(), async () => await gameUser.Start(token));
             //await Task.Run(() => Parallel.Invoke(dowork, dowork2));
-            //catch (OperationCanceledException oce)
             if (!isCPUwins && !isUserwins)
             {
-                ans.Text = "";
-                textBox1.Text = "";
                 return;
             }
             else
             {
-                if (isCPUwins) status.Content = "Победа за мной.";
+                if (isCPUwins && isUserwins) status.Content = "Похоже, это ничья.";
+                else if (isCPUwins) status.Content = "Победа за мной.";
                 else if (isUserwins) status.Content = "Вы победили!";
-                isUserwins = false;
-                isCPUwins = false;
+                //isUserwins = false;
+                //isCPUwins = false;
                 isPlaying = false;
+                //is_handleCPU_set = false;
+                //is_handleUser_set = false;
                 gameCPU = null;
                 gameUser = null;
-                tokenSource = null;
+                CPUtokenSource = null;
+                UsertokenSource = null;
+                //first_field = 0;
+                //second_field = 0;
+                //third_field = "";
             }
         }
 
@@ -138,23 +166,31 @@ namespace MasterMind_bc
         {
             if (isPlaying && !is_handleCPU_set)
             {
-                first_field = Int32.Parse(textBox.Text);
-                second_field = Int32.Parse(textBox2.Text);
+                try
+                {
+                    first_field = Int32.Parse(textBox.Text);
+                    second_field = Int32.Parse(textBox2.Text);
+                }
+                catch (FormatException fe)
+                {
+                    MessageBox.Show("Введите норм число");
+                }
                 textBox.Clear();
                 textBox2.Clear();
 
                 is_handleCPU_set = true;
                 handleCPU.Set();
-                //if (first_field == 4) isCPUwins = true;
 
                 if (is_handleUser_set)
                 {
                     status.Content = "Играем";
-                    is_handleCPU_set = false;
-                    is_handleUser_set = false;
+                    //is_handleCPU_set = false;
+                    //is_handleUser_set = false;
                     count.Text = (++counting).ToString();
+                    //handleCPU.Set();
+                    //handleUser.Set();
                 }
-                else status.Content = "User, введите число";
+                else status.Content = "Введите число";
             }
         }
 
@@ -208,7 +244,15 @@ namespace MasterMind_bc
         {
             if (isPlaying && !is_handleUser_set)
             {
-                third_field = ans2.Text;
+                if (ans2.Text == "")
+                {
+                    MessageBox.Show("Введите норм число");
+                    return;
+                }
+                else
+                {
+                    third_field = ans2.Text;
+                }
                 ans2.Clear();
 
                 is_handleUser_set = true;
@@ -216,14 +260,16 @@ namespace MasterMind_bc
                 if (is_handleCPU_set)
                 {
                     status.Content = "Играем";
-                    is_handleCPU_set = false;
-                    is_handleUser_set = false;
+                    //is_handleCPU_set = false;
+                    //is_handleUser_set = false;
                     count.Text = (++counting).ToString();
+                    //handleCPU.Set();
+                    //handleUser.Set();
                 }
-                else status.Content = "User, введите кол-во быков и коров";
+                else status.Content = "Введите кол-во быков и коров";
             }
         }
-
+        
         private string GiveMeSpaces(int amount)
         {
             string temp_s = "";

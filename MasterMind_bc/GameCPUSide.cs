@@ -20,6 +20,7 @@ namespace MasterMind_bc
 
     class GameCPUSide
     {
+        public EventWaitHandle main_handle = new AutoResetEvent(false);
         SortedSet<int> unnecessary_digitals, cows_list, COWS_THREAD, ready_indexes;
         SortedSet<int>[] used_digitals;
         int bulls, cows, prev_bulls, prev_cows, prev_value;
@@ -76,6 +77,7 @@ namespace MasterMind_bc
                 try
                 {
                     await ShowRead(token);
+                    token.ThrowIfCancellationRequested();
                     do_continue = await DoPreAnalyse(k, first_time_flag, token);
                     if (first_time_flag)
                     {
@@ -91,7 +93,7 @@ namespace MasterMind_bc
                         ChangeValue(k);
                     }
                 }
-                catch (OperationCanceledException oce) { return; }
+                catch (OperationCanceledException oce) { main_handle.Set(); return; }
             }
         }
 
@@ -115,7 +117,8 @@ namespace MasterMind_bc
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    used_digitals[i].Add(mass[i]);
+                    //used_digitals[i].Add(mass[i]);
+                    unnecessary_digitals.Add(mass[i]);
                 }
                 return false;
             }
@@ -241,6 +244,7 @@ namespace MasterMind_bc
                 Swap(ref mass[first_hand], ref mass[second_hand]);
                 //считать
                 await ShowRead(token);
+                token.ThrowIfCancellationRequested();
                 if (bulls == prev_bulls + 1)
                 {
                     await FindSingleBull(first_hand, second_hand, token);
@@ -312,6 +316,7 @@ namespace MasterMind_bc
                 mass[a] = 1 + r.Next() % 9;
             while (prev_v == mass[a] || EqualToOtherNumbers(a));
             await ShowRead(token);
+            token.ThrowIfCancellationRequested();
             mass[a] = prev_v;
             if (prev_bulls > bulls)
             {
@@ -324,15 +329,7 @@ namespace MasterMind_bc
             }
         }
 
-        /*bool Check(int limit)
-        {
-            for (int j = 0; j < limit; j++)
-                if (mass[j] == mass[limit])
-                    return true;
-            return false;
-        }*/
-
-        async Task RaiseAppeal(/*AppealToUser*/EventArgs e)
+        async Task RaiseAppeal(EventArgs e)
         {
             //EventHandler<AppealToUserEventArgs> temp = Volatile.Read(ref appeal_to_user);
             //if (temp != null) await Task.Run(() => temp(this, e));
@@ -340,20 +337,16 @@ namespace MasterMind_bc
         }
 
         public event EventHandler<AppealToUserEventArgs> show_text;
-        async Task ShowRead(CancellationToken token) // выполняется только это
+        async Task ShowRead(CancellationToken token)
         {
-            /*string temp_s = "";
-            foreach (int elem in mass)
-            {
-                temp_s += elem.ToString();
-            }*/
+            token.ThrowIfCancellationRequested();
             string temp_s = Utils.ArrToString(mass);
             AppealToUserEventArgs e = new AppealToUserEventArgs(temp_s);
             prev_bulls = bulls;
             prev_cows = cows;
             show_text(this, e);
             await RaiseAppeal(null);
-            token.ThrowIfCancellationRequested();
+            //token.ThrowIfCancellationRequested();
         }
 
         void ChangeValue(int i)
