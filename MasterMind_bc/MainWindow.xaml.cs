@@ -235,6 +235,21 @@ namespace MasterMind_bc
             return (res.SumCount() == limit + 1) ? true : false;
         }
 
+        private void view_Click(object sender, RoutedEventArgs e)
+        {
+            if (isPlaying)
+            {
+                if (!String.IsNullOrEmpty(textBox1.Text))
+                {
+                    string tmp = "Answer" + GiveMeSpaces(9) + "Bulls" + GiveMeSpaces(6) + "Cows\n";
+                    tmp += textBox1.Text;
+                    MessageBox.Show(tmp);
+                }
+                else
+                    MessageBox.Show("Пусто.");
+            }
+        }
+
         private void ans2_KeyDown(object sender, KeyEventArgs e)
         {
             if (IsNumbericChar(e.Key, 9)) e.Handled = true;

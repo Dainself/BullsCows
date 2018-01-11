@@ -43,15 +43,15 @@ namespace MasterMind_bc
             mass = new int[4];
             Random rand = new Random();
             // for debug
-            for (int i = 0; i < 4; ) mass[i] = ++i;
-            /*for (int i = 0; i < 4; i++) // заполняю случ значениями
+            //for (int i = 0; i < 4; ) mass[i] = ++i;
+            for (int i = 0; i < 4; i++) // заполняю случ значениями
             {
                 do
                 {
                     mass[i] = 1 + rand.Next() % 9;
                 }
                 while (Utils.Check(mass, i));
-            }*/
+            }
         }
 
         public async void Start(CancellationToken token)

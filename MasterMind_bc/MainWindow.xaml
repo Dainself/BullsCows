@@ -11,39 +11,24 @@
         <Button x:Name="button2" Content="Start" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="70" Height="30" Click="button2_Click"/>
 
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="22" Margin="13,120,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5" KeyDown="textBox_KeyDown">
-            <TextBox.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="-0.209"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </TextBox.RenderTransform>
         </TextBox>
-        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="24" Margin="98,117,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5" KeyDown="textBox2_KeyDown">
-            <TextBox.RenderTransform>
-                <TransformGroup>
-                    <ScaleTransform/>
-                    <SkewTransform/>
-                    <RotateTransform Angle="-0.209"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </TextBox.RenderTransform>
+        <TextBox x:Name="textBox2" HorizontalAlignment="Left" Height="24" Margin="98,120,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="80" RenderTransformOrigin="0.5,0.5" KeyDown="textBox2_KeyDown">
         </TextBox>
-        <Label x:Name="label" Content="Num of bulls" HorizontalAlignment="Left" Margin="13,89,0,0" VerticalAlignment="Top" Width="80" HorizontalContentAlignment="Center"/>
-        <Label x:Name="label2" Content="Num of cows" HorizontalAlignment="Left" Margin="98,89,0,0" VerticalAlignment="Top" Width="80" HorizontalContentAlignment="Center"/>
+        <Label x:Name="label" Content="Num of bulls" HorizontalAlignment="Left" Margin="13,90,0,0" VerticalAlignment="Top" Width="80" HorizontalContentAlignment="Center"/>
+        <Label x:Name="label2" Content="Num of cows" HorizontalAlignment="Left" Margin="98,90,0,0" VerticalAlignment="Top" Width="80" HorizontalContentAlignment="Center"/>
         <Label x:Name="label3" Content="My answer:" HorizontalAlignment="Left" Margin="13,52,0,0" VerticalAlignment="Top" Width="77"/>
-        <Button x:Name="button1" Content="OK" HorizontalAlignment="Left" Margin="60,147,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click"/>
+        <Button x:Name="button1" Content="OK" HorizontalAlignment="Left" Margin="58,149,0,0" VerticalAlignment="Top" Width="75" Click="button1_Click"/>
         <TextBox x:Name="count" HorizontalAlignment="Left" Height="24" Margin="127,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="29" IsReadOnly="True"/>
         <Label x:Name="label1" Content="Turn:" HorizontalAlignment="Left" Margin="85,10,0,0" VerticalAlignment="Top" Width="37"/>
         <Label x:Name="status" Content="" HorizontalAlignment="Left" Margin="161,8,0,0" VerticalAlignment="Top" Width="181"/>
         <TextBox x:Name="ans" HorizontalAlignment="Left" Height="23" Margin="96,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="76" IsReadOnly="True"/>
         <Label x:Name="label4" Content="Your answer:" HorizontalAlignment="Left" Margin="207,52,0,0" VerticalAlignment="Top" Width="77"/>
         <TextBox x:Name="ans2" HorizontalAlignment="Left" Height="23" Margin="290,52,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="76" KeyDown="ans2_KeyDown"/>
-        <Label x:Name="label5" Content="Answer" HorizontalAlignment="Left" Margin="207,83,0,0" VerticalAlignment="Top" Width="73"/>
-        <Label x:Name="label6" Content="Bulls" HorizontalAlignment="Left" Margin="285,83,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="label7" Content="Cows" HorizontalAlignment="Left" Margin="328,83,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="55" Margin="207,114,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="159" VerticalScrollBarVisibility ="Auto" IsReadOnly="True"/>
+        <Label x:Name="label5" Content="Answer" HorizontalAlignment="Left" Margin="207,90,0,0" VerticalAlignment="Top" Width="73"/>
+        <Label x:Name="label6" Content="Bulls" HorizontalAlignment="Left" Margin="285,90,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label7" Content="Cows" HorizontalAlignment="Left" Margin="328,90,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="55" Margin="207,120,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="159" VerticalScrollBarVisibility ="Auto" IsReadOnly="True"/>
         <Button x:Name="button3" Content="OK" HorizontalAlignment="Left" Margin="372,52,0,0" VerticalAlignment="Top" Width="47" Click="button3_Click"/>
+        <Button x:Name="view" HorizontalAlignment="Left" Margin="371,120,0,0" VerticalAlignment="Top" Width="48" Height="24" Content="Увелич." Click="view_Click" />
     </Grid>
 </Window>
