@@ -23,8 +23,9 @@ namespace MasterMind_bc
             InitializeComponent();
         }
 
-        CancellationTokenSource CPUtokenSource;
-        CancellationTokenSource UsertokenSource;
+        //CancellationTokenSource CPUtokenSource;
+        //CancellationTokenSource UsertokenSource;
+        CancellationTokenSource tokenSource;
         EventWaitHandle handleCPU = new AutoResetEvent(false);
         EventWaitHandle handleUser = new AutoResetEvent(false);
         bool is_handleCPU_set;
@@ -35,8 +36,8 @@ namespace MasterMind_bc
             if (first_field == 4)
             {
                 isCPUwins = true;
-                CPUtokenSource.Cancel();
-                UsertokenSource.Cancel();
+                tokenSource.Cancel();
+                tokenSource.Cancel();
                 if (is_handleUser_set)
                 {
                     gameUser.isShowRequired = false;
@@ -68,8 +69,8 @@ namespace MasterMind_bc
             if (e.Bulls == 4)
             {
                 isUserwins = true;
-                UsertokenSource.Cancel();
-                CPUtokenSource.Cancel();
+                tokenSource.Cancel();
+                tokenSource.Cancel();
                 if (is_handleCPU_set) handleCPU.Set();
             }
             if (is_handleCPU_set && is_handleUser_set)
@@ -87,13 +88,15 @@ namespace MasterMind_bc
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            if (CPUtokenSource != null && UsertokenSource != null/** && gameCPU != null && gameUser != null*/)
+            if (tokenSource != null /*&& UsertokenSource != null*//** && gameCPU != null && gameUser != null*/)
             {
                 gameUser.isShowRequired = false;
-                CPUtokenSource.Cancel();
-                UsertokenSource.Cancel();
-                if (!is_handleCPU_set) handleCPU.Set();
-                if (!is_handleUser_set) handleUser.Set();
+                tokenSource.Cancel();
+                //UsertokenSource.Cancel();
+                handleCPU.Set();
+                handleUser.Set();
+                //if (!is_handleCPU_set) handleCPU.Set();
+                //if (!is_handleUser_set) handleUser.Set();
             }
             isUserwins = false;
             isCPUwins = false;
@@ -108,10 +111,12 @@ namespace MasterMind_bc
             await Task.Run(() => Thread.Sleep(380));
             isPlaying = true;
             counting = 0;
-            CPUtokenSource = new CancellationTokenSource();
-            UsertokenSource = new CancellationTokenSource();
-            CancellationToken CPUtoken = CPUtokenSource.Token;
-            CancellationToken Usertoken = UsertokenSource.Token;
+            //CPUtokenSource = new CancellationTokenSource();
+            //UsertokenSource = new CancellationTokenSource();
+            tokenSource = new CancellationTokenSource();
+            CancellationToken token = tokenSource.Token;
+            //CancellationToken CPUtoken = CPUtokenSource.Token;
+            //CancellationToken Usertoken = UsertokenSource.Token;
             /** CPU Side **/
             gameCPU = new GameCPUSide();
             gameCPU.appeal_to_user += UserProcessing;
@@ -127,10 +132,10 @@ namespace MasterMind_bc
             status.Content = "Играем";
             Parallel.Invoke(async () =>
             {
-                await Application.Current.Invoke(() => { gameCPU.Start(CPUtoken); });
+                await Application.Current.Invoke(() => { gameCPU.Start(token); });
             }, async () =>
             {
-                await Application.Current.Invoke(() => { gameUser.Start(Usertoken); });
+                await Application.Current.Invoke(() => { gameUser.Start(token); });
             });
             await Task.Run(() => gameCPU.main_handle.WaitOne());
             await Task.Run(() => gameUser.main_handle.WaitOne());
@@ -154,9 +159,8 @@ namespace MasterMind_bc
                 //is_handleUser_set = false;
                 gameCPU = null;
                 gameUser = null;
-                CPUtokenSource = null;
-                UsertokenSource = null;
-                //first_field = 0;
+                tokenSource = null;
+                //first_field = 0; 
                 //second_field = 0;
                 //third_field = "";
             }

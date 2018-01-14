@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="SvgToXamlColor1">#FF000000</Color>
+    <SolidColorBrush x:Key="SvgToXamlColorBrush1" Color="{DynamicResource SvgToXamlColor1}" />
+    <Geometry x:Key="loupeGeometry1">F1 M485.213,485.213z M0,0z M363.909,181.955C363.909,81.473 282.44,0 181.956,0 81.474,0 0.001,81.473 0.001,181.955 0.001,282.437 81.474,363.906 181.956,363.906 282.44,363.906 363.909,282.437 363.909,181.955z M181.956,318.416C106.704,318.416 45.491,257.208 45.491,181.956 45.491,106.704 106.704,45.491 181.956,45.491 257.206,45.491 318.424,106.704 318.424,181.956 318.424,257.208 257.206,318.416 181.956,318.416z</Geometry>
+    <Geometry x:Key="loupeGeometry2">F1 M485.213,485.213z M0,0z M471.882,407.567L360.567,296.243C343.981,322.038,322.031,343.977,296.236,360.564L407.56,471.888C425.332,489.656 454.147,489.656 471.881,471.888 489.654,454.149 489.654,425.334 471.882,407.567z</Geometry>
+    <SolidColorBrush x:Key="loupeBrushColor1" Color="{Binding Color, Source={StaticResource SvgToXamlColorBrush1}}" />
+    <SolidColorBrush x:Key="loupeBrushColor2" Color="{Binding Color, Source={StaticResource SvgToXamlColorBrush1}}" />
+    <DrawingGroup x:Key="loupeDrawingGroup" ClipGeometry="M0,0 V485,213 H485,213 V0 H0 Z">
+        <DrawingGroup>
+            <GeometryDrawing Brush="{DynamicResource loupeBrushColor1}" Geometry="{StaticResource loupeGeometry1}" />
+            <GeometryDrawing Brush="{DynamicResource loupeBrushColor2}" Geometry="{StaticResource loupeGeometry2}" />
+        </DrawingGroup>
+    </DrawingGroup>
+    <DrawingImage x:Key="loupeDrawingImage" Drawing="{StaticResource loupeDrawingGroup}" />
+    <Geometry x:Key="magnifier_1_icon_icons_com_56924Geometry1">F1 M485.213,485.213z M0,0z M471.882,407.567L360.567,296.243C343.981,322.038,322.031,343.977,296.236,360.564L407.56,471.888C425.332,489.656 454.147,489.656 471.881,471.888 489.654,454.149 489.654,425.334 471.882,407.567z</Geometry>
+    <Geometry x:Key="magnifier_1_icon_icons_com_56924Geometry2">F1 M485.213,485.213z M0,0z M363.909,181.955C363.909,81.473 282.44,0 181.956,0 81.474,0 0.001,81.473 0.001,181.955 0.001,282.437 81.474,363.906 181.956,363.906 282.44,363.906 363.909,282.437 363.909,181.955z M181.956,318.416C106.704,318.416 45.491,257.208 45.491,181.956 45.491,106.704 106.704,45.491 181.956,45.491 257.206,45.491 318.424,106.704 318.424,181.956 318.424,257.208 257.206,318.416 181.956,318.416z</Geometry>
+    <Geometry x:Key="magnifier_1_icon_icons_com_56924Geometry3">F1 M485.213,485.213z M0,0z M75.817,181.955L106.139,181.955C106.139,140.152,140.153,106.141,181.955,106.141L181.955,75.816C123.438,75.816,75.817,123.437,75.817,181.955z</Geometry>
+    <SolidColorBrush x:Key="magnifier_1_icon_icons_com_56924BrushColor1" Color="{Binding Color, Source={StaticResource SvgToXamlColorBrush1}}" />
+    <SolidColorBrush x:Key="magnifier_1_icon_icons_com_56924BrushColor2" Color="{Binding Color, Source={StaticResource SvgToXamlColorBrush1}}" />
+    <SolidColorBrush x:Key="magnifier_1_icon_icons_com_56924BrushColor3" Color="{Binding Color, Source={StaticResource SvgToXamlColorBrush1}}" />
+    <DrawingGroup x:Key="magnifier_1_icon_icons_com_56924DrawingGroup" ClipGeometry="M0,0 V485,485 H485,485 V0 H0 Z">
+        <DrawingGroup>
+            <GeometryDrawing Brush="{DynamicResource magnifier_1_icon_icons_com_56924BrushColor1}" Geometry="{StaticResource magnifier_1_icon_icons_com_56924Geometry1}" />
+            <GeometryDrawing Brush="{DynamicResource magnifier_1_icon_icons_com_56924BrushColor2}" Geometry="{StaticResource magnifier_1_icon_icons_com_56924Geometry2}" />
+            <GeometryDrawing Brush="{DynamicResource magnifier_1_icon_icons_com_56924BrushColor3}" Geometry="{StaticResource magnifier_1_icon_icons_com_56924Geometry3}" />
+        </DrawingGroup>
+    </DrawingGroup>
+    <DrawingImage x:Key="loupeDrawingImage2" Drawing="{StaticResource magnifier_1_icon_icons_com_56924DrawingGroup}" />
+</ResourceDictionary>
