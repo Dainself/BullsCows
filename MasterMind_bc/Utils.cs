@@ -28,6 +28,16 @@ namespace MasterMind_bc
             return false;
         }
 
+        public static bool EqualToOtherNumbers(int[] mass, int i)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if (mass[j] == mass[i] && j != i)
+                    return true;
+            }
+            return false;
+        }
+
         public static int[] StringToArr(string str)
         {
             int len = str.Length;

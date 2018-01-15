@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Text;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Threading;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MasterMind_bc
 {
@@ -23,8 +23,6 @@ namespace MasterMind_bc
             InitializeComponent();
         }
 
-        //CancellationTokenSource CPUtokenSource;
-        //CancellationTokenSource UsertokenSource;
         CancellationTokenSource tokenSource;
         EventWaitHandle handleCPU = new AutoResetEvent(false);
         EventWaitHandle handleUser = new AutoResetEvent(false);
@@ -78,25 +76,21 @@ namespace MasterMind_bc
                 is_handleCPU_set = false;
                 is_handleUser_set = false;
             }
-            textBox1.Text += third_field;
-            textBox1.Text += GiveMeSpaces(15);
-            textBox1.Text += e.Bulls.ToString();
-            textBox1.Text += GiveMeSpaces(12);
-            textBox1.Text += e.Cows.ToString();
-            textBox1.Text += "\n";
+            StringBuilder sb = new StringBuilder(textBox1.Text.Length + 34);
+            sb.AppendFormat("{0}{1}{2}{3}", textBox1.Text, third_field, GiveMeSpaces(15), e.Bulls.ToString());
+            sb.AppendFormat("{0}{1}", GiveMeSpaces(12), e.Cows.ToString());
+            sb.AppendLine();
+            textBox1.Text = sb.ToString();
         }
 
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            if (tokenSource != null /*&& UsertokenSource != null*//** && gameCPU != null && gameUser != null*/)
+            if (tokenSource != null)
             {
                 gameUser.isShowRequired = false;
                 tokenSource.Cancel();
-                //UsertokenSource.Cancel();
                 handleCPU.Set();
                 handleUser.Set();
-                //if (!is_handleCPU_set) handleCPU.Set();
-                //if (!is_handleUser_set) handleUser.Set();
             }
             isUserwins = false;
             isCPUwins = false;
@@ -111,16 +105,14 @@ namespace MasterMind_bc
             await Task.Run(() => Thread.Sleep(380));
             isPlaying = true;
             counting = 0;
-            //CPUtokenSource = new CancellationTokenSource();
-            //UsertokenSource = new CancellationTokenSource();
             tokenSource = new CancellationTokenSource();
             CancellationToken token = tokenSource.Token;
-            //CancellationToken CPUtoken = CPUtokenSource.Token;
-            //CancellationToken Usertoken = UsertokenSource.Token;
+
             /** CPU Side **/
             gameCPU = new GameCPUSide();
             gameCPU.appeal_to_user += UserProcessing;
             gameCPU.show_text += ShowText;
+
             /** User Side **/
             gameUser = new GameUserSide();
             gameUser.appeal_to_user += UserProcessing2;
@@ -139,10 +131,6 @@ namespace MasterMind_bc
             });
             await Task.Run(() => gameCPU.main_handle.WaitOne());
             await Task.Run(() => gameUser.main_handle.WaitOne());
-
-            /*await Application.Current.Invoke(() => { gameUser.Start(token); }));*/
-            //Parallel.Invoke(async () => await gameCPU.Start(), async () => await gameUser.Start(token));
-            //await Task.Run(() => Parallel.Invoke(dowork, dowork2));
             if (!isCPUwins && !isUserwins)
             {
                 return;
@@ -152,17 +140,10 @@ namespace MasterMind_bc
                 if (isCPUwins && isUserwins) status.Content = "Похоже, это ничья.";
                 else if (isCPUwins) status.Content = "Победа за мной.";
                 else if (isUserwins) status.Content = "Вы победили!";
-                //isUserwins = false;
-                //isCPUwins = false;
                 isPlaying = false;
-                //is_handleCPU_set = false;
-                //is_handleUser_set = false;
                 gameCPU = null;
                 gameUser = null;
                 tokenSource = null;
-                //first_field = 0; 
-                //second_field = 0;
-                //third_field = "";
             }
         }
 
@@ -188,11 +169,7 @@ namespace MasterMind_bc
                 if (is_handleUser_set)
                 {
                     status.Content = "Играем";
-                    //is_handleCPU_set = false;
-                    //is_handleUser_set = false;
                     count.Text = (++counting).ToString();
-                    //handleCPU.Set();
-                    //handleUser.Set();
                 }
                 else status.Content = "Введите число";
             }
@@ -245,9 +222,11 @@ namespace MasterMind_bc
             {
                 if (!String.IsNullOrEmpty(textBox1.Text))
                 {
-                    string tmp = "Answer" + GiveMeSpaces(9) + "Bulls" + GiveMeSpaces(6) + "Cows\n";
-                    tmp += textBox1.Text;
-                    MessageBox.Show(tmp);
+                    StringBuilder sb = new StringBuilder();
+                    sb.AppendFormat("{0}{1}{2}{3}{4}", "Answer", GiveMeSpaces(9), "Bulls", GiveMeSpaces(6), "Cows");
+                    sb.AppendLine();
+                    sb.Append(textBox1.Text);
+                    MessageBox.Show(sb.ToString());
                 }
                 else
                     MessageBox.Show("Пусто.");
@@ -257,6 +236,7 @@ namespace MasterMind_bc
         private void ans2_KeyDown(object sender, KeyEventArgs e)
         {
             if (IsNumbericChar(e.Key, 9)) e.Handled = true;
+            if (ans2.Text.Length == 4) e.Handled = true;
         }
 
         private void button3_Click(object sender, RoutedEventArgs e)
@@ -265,13 +245,19 @@ namespace MasterMind_bc
             {
                 if (ans2.Text == "")
                 {
-                    MessageBox.Show("Введите норм число");
+                    MessageBox.Show("Строка пуста");
                     return;
                 }
-                else
+                int[] mass = Utils.StringToArr(ans2.Text);
+                for (int i = 0; i < 4; i++)
                 {
-                    third_field = ans2.Text;
+                    if (Utils.EqualToOtherNumbers(mass, i))
+                    {
+                        MessageBox.Show("Некорректная строка");
+                        return;
+                    }
                 }
+                third_field = ans2.Text;
                 ans2.Clear();
 
                 is_handleUser_set = true;
@@ -279,11 +265,7 @@ namespace MasterMind_bc
                 if (is_handleCPU_set)
                 {
                     status.Content = "Играем";
-                    //is_handleCPU_set = false;
-                    //is_handleUser_set = false;
                     count.Text = (++counting).ToString();
-                    //handleCPU.Set();
-                    //handleUser.Set();
                 }
                 else status.Content = "Введите кол-во быков и коров";
             }
@@ -291,12 +273,12 @@ namespace MasterMind_bc
         
         private string GiveMeSpaces(int amount)
         {
-            string temp_s = "";
+            StringBuilder temp_s = new StringBuilder();
             for (int i = 0; i < amount; i++)
             {
-                temp_s += " ";
+                temp_s.Append(" ");
             }
-            return temp_s;
+            return temp_s.ToString();
         }
     }
 }

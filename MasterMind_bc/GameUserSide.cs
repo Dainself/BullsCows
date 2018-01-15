@@ -124,7 +124,6 @@ namespace MasterMind_bc
         public event EventHandler<AppealToUserEventArgs2> show_result;
         void Show(CancellationToken token)
         {
-            //if (bulls == 4) //уведомить о победе /// нет. на той стороне сами пусть проверяют
             ///говорю результат
             show_result(this, new AppealToUserEventArgs2(bulls, cows));
             token.ThrowIfCancellationRequested();

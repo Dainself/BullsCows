@@ -117,7 +117,6 @@ namespace MasterMind_bc
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    //used_digitals[i].Add(mass[i]);
                     unnecessary_digitals.Add(mass[i]);
                 }
                 return false;
@@ -314,7 +313,7 @@ namespace MasterMind_bc
             int prev_v = mass[a];
             do
                 mass[a] = 1 + r.Next() % 9;
-            while (prev_v == mass[a] || EqualToOtherNumbers(a));
+            while (prev_v == mass[a] || Utils.EqualToOtherNumbers(mass, a));
             await ShowRead(token);
             token.ThrowIfCancellationRequested();
             mass[a] = prev_v;
@@ -346,7 +345,6 @@ namespace MasterMind_bc
             prev_cows = cows;
             show_text(this, e);
             await RaiseAppeal(null);
-            //token.ThrowIfCancellationRequested();
         }
 
         void ChangeValue(int i)
@@ -382,17 +380,7 @@ namespace MasterMind_bc
                     return true;
             }
             //если mass[i] равен другим числам в массиве
-            if (EqualToOtherNumbers(i)) return true;
-            return false;
-        }
-
-        bool EqualToOtherNumbers(int i)
-        {
-            for (int j = 0; j < 4; j++)
-            {
-                if (mass[j] == mass[i] && j != i)
-                    return true;
-            }
+            if (Utils.EqualToOtherNumbers(mass, i)) return true;
             return false;
         }
     }
