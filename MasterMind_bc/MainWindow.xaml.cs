@@ -16,8 +16,8 @@ namespace MasterMind_bc
         bool isPlaying, isCPUwins, isUserwins;
         GameCPUSide gameCPU;
         GameUserSide gameUser;
-        int first_field, second_field;
-        string third_field;
+        int first_field, second_field; //bulls and cows to CPU
+        string third_field; // answer from user
         public MainWindow()
         {
             InitializeComponent();
@@ -28,10 +28,12 @@ namespace MasterMind_bc
         EventWaitHandle handleUser = new AutoResetEvent(false);
         bool is_handleCPU_set;
         bool is_handleUser_set;
+
+        // waits for inputing bulls and cows, send them to calling class (to sender)
         void UserProcessing(object sender, EventArgs e)
         {
             handleCPU.WaitOne();
-            if (first_field == 4)
+            if (first_field == 4) // win case
             {
                 isCPUwins = true;
                 tokenSource.Cancel();
@@ -42,7 +44,7 @@ namespace MasterMind_bc
                     handleUser.Set();
                 }
             }
-            if (is_handleCPU_set && is_handleUser_set)
+            if (is_handleCPU_set && is_handleUser_set) // reset case
             {
                 is_handleCPU_set = false;
                 is_handleUser_set = false;
@@ -51,27 +53,30 @@ namespace MasterMind_bc
             ((GameCPUSide)sender).Cows = second_field;
         }
 
+        // shows text (array from CPU)
         void ShowText(object sender, AppealToUserEventArgs e)
         {
             ans.Text = e.Arr;
         }
 
+        // waits for inputing digit, send it to calling class (to sender)
         void UserProcessing2(object sender, EventArgs e)
         {
             handleUser.WaitOne();
             ((GameUserSide)sender).UserMass = Utils.StringToArr(third_field);
         }
 
+        // shows text (arrays from user with numbers of bulls/cows)
         void ShowText2(object sender, AppealToUserEventArgs2 e)
         {
-            if (e.Bulls == 4)
+            if (e.Bulls == 4) // win case
             {
                 isUserwins = true;
                 tokenSource.Cancel();
                 tokenSource.Cancel();
                 if (is_handleCPU_set) handleCPU.Set();
             }
-            if (is_handleCPU_set && is_handleUser_set)
+            if (is_handleCPU_set && is_handleUser_set) // reset case
             {
                 is_handleCPU_set = false;
                 is_handleUser_set = false;
@@ -83,9 +88,10 @@ namespace MasterMind_bc
             textBox1.Text = sb.ToString();
         }
 
+        // START button
         private async void button2_Click(object sender, RoutedEventArgs e)
         {
-            if (tokenSource != null)
+            if (tokenSource != null) // if already playing, start new game. old game is cancelled
             {
                 gameUser.isShowRequired = false;
                 tokenSource.Cancel();
@@ -101,7 +107,7 @@ namespace MasterMind_bc
             second_field = 0;
             third_field = "";
 
-            status.Content = "Загрузка, подождите...";
+            status.Content = "Please wait, loading...";
             await Task.Run(() => Thread.Sleep(380));
             isPlaying = true;
             counting = 0;
@@ -121,7 +127,8 @@ namespace MasterMind_bc
             ans.Text = "";
             textBox1.Text = "";
             count.Text = counting.ToString();
-            status.Content = "Играем";
+            status.Content = "Playing";
+            // game invoke
             Parallel.Invoke(async () =>
             {
                 await Application.Current.Invoke(() => { gameCPU.Start(token); });
@@ -129,17 +136,18 @@ namespace MasterMind_bc
             {
                 await Application.Current.Invoke(() => { gameUser.Start(token); });
             });
+            // wait until classes finished work
             await Task.Run(() => gameCPU.main_handle.WaitOne());
             await Task.Run(() => gameUser.main_handle.WaitOne());
-            if (!isCPUwins && !isUserwins)
+            if (!isCPUwins && !isUserwins) // rude cancellation case (new game requested)
             {
                 return;
             }
             else
             {
-                if (isCPUwins && isUserwins) status.Content = "Похоже, это ничья.";
-                else if (isCPUwins) status.Content = "Победа за мной.";
-                else if (isUserwins) status.Content = "Вы победили!";
+                if (isCPUwins && isUserwins) status.Content = "Seems like it's a draw.";
+                else if (isCPUwins) status.Content = "I gained the victory.";
+                else if (isUserwins) status.Content = "You win!";
                 isPlaying = false;
                 gameCPU = null;
                 gameUser = null;
@@ -147,6 +155,7 @@ namespace MasterMind_bc
             }
         }
 
+        // reads number of bulls/cows from user
         private void button1_Click(object sender, RoutedEventArgs e)
         {
             if (isPlaying && !is_handleCPU_set)
@@ -158,7 +167,7 @@ namespace MasterMind_bc
                 }
                 catch (FormatException fe)
                 {
-                    MessageBox.Show("Введите норм число");
+                    MessageBox.Show("Enter correct number");
                 }
                 textBox.Clear();
                 textBox2.Clear();
@@ -168,18 +177,20 @@ namespace MasterMind_bc
 
                 if (is_handleUser_set)
                 {
-                    status.Content = "Играем";
+                    status.Content = "Playing";
                     count.Text = (++counting).ToString();
                 }
-                else status.Content = "Введите число";
+                else status.Content = "Enter your digit";
             }
         }
 
+        // EXIT button
         private void button_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
 
+        // supports only numberic text
         private void textBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (IsNumbericChar(e.Key, 4)) e.Handled = true;
@@ -216,6 +227,7 @@ namespace MasterMind_bc
             return (res.SumCount() == limit + 1) ? true : false;
         }
 
+        // shows history of user answers in MessageBox
         private void view_Click(object sender, RoutedEventArgs e)
         {
             if (isPlaying)
@@ -229,7 +241,7 @@ namespace MasterMind_bc
                     MessageBox.Show(sb.ToString());
                 }
                 else
-                    MessageBox.Show("Пусто.");
+                    MessageBox.Show("Empty.");
             }
         }
 
@@ -239,13 +251,15 @@ namespace MasterMind_bc
             if (ans2.Text.Length == 4) e.Handled = true;
         }
 
+        // reads digit from user
         private void button3_Click(object sender, RoutedEventArgs e)
         {
             if (isPlaying && !is_handleUser_set)
             {
+                // some text check
                 if (ans2.Text == "")
                 {
-                    MessageBox.Show("Строка пуста");
+                    MessageBox.Show("Line is empty");
                     return;
                 }
                 int[] mass = Utils.StringToArr(ans2.Text);
@@ -253,7 +267,7 @@ namespace MasterMind_bc
                 {
                     if (Utils.EqualToOtherNumbers(mass, i))
                     {
-                        MessageBox.Show("Некорректная строка");
+                        MessageBox.Show("Uncorrect line");
                         return;
                     }
                 }
@@ -264,13 +278,14 @@ namespace MasterMind_bc
                 handleUser.Set();
                 if (is_handleCPU_set)
                 {
-                    status.Content = "Играем";
+                    status.Content = "Playing";
                     count.Text = (++counting).ToString();
                 }
-                else status.Content = "Введите кол-во быков и коров";
+                else status.Content = "Enter bulls and cows";
             }
         }
         
+        // makes " " symbols
         private string GiveMeSpaces(int amount)
         {
             StringBuilder temp_s = new StringBuilder();

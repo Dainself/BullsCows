@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace MasterMind_bc
 {
+	// class for assistant methods
     static class Utils
     {
         public async static Task Invoke(this Application app, Action action, DispatcherPriority priority = DispatcherPriority.Normal)

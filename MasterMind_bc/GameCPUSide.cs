@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace MasterMind_bc
 {
+    // class for sending CPU answer
     class AppealToUserEventArgs : EventArgs
     {
         readonly string arr;
@@ -20,7 +21,7 @@ namespace MasterMind_bc
 
     class GameCPUSide
     {
-        public EventWaitHandle main_handle = new AutoResetEvent(false);
+        public EventWaitHandle main_handle = new AutoResetEvent(false); // for waiting in main window
         SortedSet<int> unnecessary_digitals, cows_list, COWS_THREAD, ready_indexes;
         SortedSet<int>[] used_digitals;
         int bulls, cows, prev_bulls, prev_cows, prev_value;
@@ -47,13 +48,13 @@ namespace MasterMind_bc
             COWS_THREAD = new SortedSet<int>();
             ready_indexes = new SortedSet<int>();
             used_digitals = new SortedSet<int>[4];
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++) 
             {
                 used_digitals[i] = new SortedSet<int>();
             }
             mass = new int[4];
             Random rand = new Random();
-            for (int i = 0; i < 4; i++) // заполняю случ значениями
+            for (int i = 0; i < 4; i++) // init array by random numbers
             {
                 do
                 {
@@ -61,50 +62,55 @@ namespace MasterMind_bc
                 }
                 while (Utils.Check(mass, i));
             }
-            for (int i = 1; i < 4; i++)
+            for (int i = 1; i < 4; i++) // add current digits to already used
             {
                 used_digitals[i].Add(mass[i]);
             }
         }
 
+		// main strategy - quickly find all cows, and then do transpositions
         public async void Start(CancellationToken token)
         {
-            int k = 0; // для индексации mass
+            int k = 0; // index for mass
             bool first_time_flag = true, do_continue;
-            // игровой цикл
-            while (!isWin) 
+            // game cycle
+            while (!isWin)
             {
                 try
                 {
-                    await ShowRead(token);
+                    await ShowRead(token); // show data and read result from user
                     token.ThrowIfCancellationRequested();
-                    do_continue = await DoPreAnalyse(k, first_time_flag, token);
-                    if (first_time_flag)
+                    do_continue = await DoPreAnalyse(k, first_time_flag, token); // fast-analyse
+                    if (first_time_flag) // no real analyse in first time
                     {
                         first_time_flag = false;
                         goto for_the_first_time;
                     }
-                    if (do_continue) DoAnalyse(ref k);
+                    if (do_continue) DoAnalyse(ref k); // do analyse
                     if (isWin) return;
                     for_the_first_time:
-                    {
+                    { // remember and change current value
                         used_digitals[k].Add(mass[k]);
                         prev_value = mass[k];
                         ChangeValue(k);
                     }
                 }
+				// if game finished or cancelled by button START
+				// (otherwords, this is done in any situations)
                 catch (OperationCanceledException oce) { main_handle.Set(); return; }
             }
         }
 
-        async Task<bool> DoPreAnalyse(int index, bool status, CancellationToken token) // возможно это не пре, а пост анализ. стоит обдумоть
+		// check simply cases
+		// maybe this's a real analyse, not pre. it is worth considering
+        async Task<bool> DoPreAnalyse(int index, bool status, CancellationToken token)
         {
             if (bulls == 4)
             {
                 isWin = true;
                 return false;
             }
-            else if (bulls + cows == 4)
+            else if (bulls + cows == 4) // in this case do transpositions
             {
                 if (prev_bulls < bulls && !status)
                 {
@@ -124,6 +130,7 @@ namespace MasterMind_bc
             return true;
         }
 
+		// analyse. there are deals with different situations
         void DoAnalyse(ref int index)
         {
             if (prev_cows == cows)
@@ -156,7 +163,7 @@ namespace MasterMind_bc
                         isCOWS_THREAD = false;
                     }
                     else unnecessary_digitals.Add(prev_value);
-                    ready_indexes.Add(index); //закрепить индекс
+                    ready_indexes.Add(index); // fix the index
                     index++;
                 }
                 else if (prev_bulls > bulls)
@@ -164,7 +171,7 @@ namespace MasterMind_bc
                     unnecessary_digitals.Add(mass[index]);
                     mass[index] = prev_value;
                     bulls++;
-                    ready_indexes.Add(index); //закрепить индекс
+                    ready_indexes.Add(index); // fix the index
                     index++;
                 }
             }
@@ -183,8 +190,8 @@ namespace MasterMind_bc
                     }
                     else cows_list.Add(prev_value);
                     unnecessary_digitals.Add(mass[index]);
-                    mass[index] = cows_list.First(); // возможно проблем
-                    cows_list.Remove(cows_list.First()); // тоже
+                    mass[index] = cows_list.First();
+                    cows_list.Remove(cows_list.First());
                     cows++;
                     index++;
                 }
@@ -220,7 +227,7 @@ namespace MasterMind_bc
                     else unnecessary_digitals.Add(prev_value);
                     index++;
                 }
-                else if (prev_bulls > bulls) //то знач заносим в кч. на это место ставим знач_п, знач_п в ннч (ли?) и б++, к--. i++
+                else if (prev_bulls > bulls)
                 {
                     cows_list.Add(mass[index]);
                     mass[index] = prev_value;
@@ -233,6 +240,7 @@ namespace MasterMind_bc
             isSelectedDuetoAdvance = false;
         }
 
+		// consistently swap 2 elements
         async Task DoTransposition(CancellationToken token)
         {
             int first_hand = -1;
@@ -241,16 +249,15 @@ namespace MasterMind_bc
             {
                 IndexShift(ref first_hand, ref second_hand);
                 Swap(ref mass[first_hand], ref mass[second_hand]);
-                //считать
                 await ShowRead(token);
                 token.ThrowIfCancellationRequested();
-                if (bulls == prev_bulls + 1)
+                if (bulls == prev_bulls + 1) // questionable, need to find out bull
                 {
                     await FindSingleBull(first_hand, second_hand, token);
                     first_hand = -1;
                     second_hand = -1;
                 }
-                else if (bulls == prev_bulls + 2)
+                else if (bulls == prev_bulls + 2) // clearly
                 {
                     ready_indexes.Add(first_hand);
                     ready_indexes.Add(second_hand);
@@ -269,6 +276,7 @@ namespace MasterMind_bc
             isWin = true;
         }
 
+		// shift swapping indexes
         void IndexShift(ref int a, ref int b)
         {
             if (a == -1 && b == -1)
@@ -290,6 +298,7 @@ namespace MasterMind_bc
             }
         }
 
+		// select indexes to swap
         void FindFirstFreeIndex(ref int f, ref int gran) // MAYBE CORRECT
         {
             do
@@ -307,16 +316,18 @@ namespace MasterMind_bc
             b = temp;
         }
 
+		// disambiguation when the bull appears
         async Task FindSingleBull(int a, int b, CancellationToken token)
         {
             Random r = new Random();
             int prev_v = mass[a];
             do
-                mass[a] = 1 + r.Next() % 9;
+                mass[a] = 1 + r.Next() % 9; // change a first digit to random
             while (prev_v == mass[a] || Utils.EqualToOtherNumbers(mass, a));
             await ShowRead(token);
             token.ThrowIfCancellationRequested();
-            mass[a] = prev_v;
+            mass[a] = prev_v; // reset value
+			// and make conclusion
             if (prev_bulls > bulls)
             {
                 bulls++;
@@ -330,11 +341,13 @@ namespace MasterMind_bc
 
         async Task RaiseAppeal(EventArgs e)
         {
+			// as an alternative:
             //EventHandler<AppealToUserEventArgs> temp = Volatile.Read(ref appeal_to_user);
             //if (temp != null) await Task.Run(() => temp(this, e));
             await Task.Run(() => Volatile.Read(ref appeal_to_user)?.Invoke(this, e));
         }
 
+		// show array and reading answer from user
         public event EventHandler<AppealToUserEventArgs> show_text;
         async Task ShowRead(CancellationToken token)
         {
@@ -347,11 +360,12 @@ namespace MasterMind_bc
             await RaiseAppeal(null);
         }
 
+		// change value in array
         void ChangeValue(int i)
         {
             Random r = new Random();
             prev_value = mass[i];
-            if (cows_list.Count != 0) // все-таки посоветуемся с листом коров
+            if (cows_list.Count != 0) // consult with cows_list
             {
                 mass[i] = cows_list.First();
                 cows_list.Remove(cows_list.First());
@@ -365,21 +379,22 @@ namespace MasterMind_bc
             }
         }
 
+		// check new value to be suitable
         bool CheckValue(int i)
         {
-            //если mass[i] содержится в #ич
+            //if mass[i] contains in #ич
             foreach (int elem in used_digitals[i])
             {
                 if (mass[i] == elem)
                     return true;
             }
-            //если mass[i] содержится в #ннч
+            //if mass[i] contains in #ннч
             foreach (int elem in unnecessary_digitals)
             {
                 if (mass[i] == elem)
                     return true;
             }
-            //если mass[i] равен другим числам в массиве
+            //if mass[i] equals to other numbers in array
             if (Utils.EqualToOtherNumbers(mass, i)) return true;
             return false;
         }
